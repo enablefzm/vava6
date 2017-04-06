@@ -5,8 +5,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"math/rand"
+	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -117,4 +120,11 @@ func MapToJson(mpInfo map[string]interface{}) string {
 	return string(btInfo)
 }
 
-// func JsonToMap(strJson string) map[string]interface
+// 获取当前目录
+func GetNowPath() (string, error) {
+	file, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		return "", err
+	}
+	return file[0:strings.LastIndex(file, "\\")], nil
+}
