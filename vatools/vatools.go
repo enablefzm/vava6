@@ -7,9 +7,9 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -124,7 +124,11 @@ func MapToJson(mpInfo map[string]interface{}) string {
 func GetNowPath() (string, error) {
 	file, err := exec.LookPath(os.Args[0])
 	if err != nil {
-		return "", err
+		return "/", err
 	}
-	return file[0:strings.LastIndex(file, "\\")], nil
+	path, err := filepath.Abs(file)
+	if err != nil {
+		return "/", err
+	}
+	return filepath.Dir(path), nil
 }
