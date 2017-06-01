@@ -33,6 +33,7 @@ type NaviConnect struct {
 	bufLen   int
 	onfunc   func(MConn)   // 回调函数
 	onCount  func() string // 返回总在线人数
+	fnError  func(error)   // 错误时执行
 }
 
 // 通过WebSocket连接进来的事件处理
@@ -50,6 +51,16 @@ func (this *NaviConnect) onSocket(conn net.Conn) {
 	}
 	// 将这个连接转交给游戏世界处理这个连接
 	this.onfunc(sock)
+}
+
+func (this *NaviConnect) OnError(err error) {
+	if this.fnError != nil {
+		this.fnError(err)
+	}
+}
+
+func (this *NaviConnect) SetError(fn func(error)) {
+	this.fnError = fn
 }
 
 func (this *NaviConnect) CountPlayer(rw http.ResponseWriter, req *http.Request) {
@@ -72,7 +83,9 @@ func (this *NaviConnect) Listen() {
 		valog.OBLog.LogMessage("开始WebSocket侦听 " + this.ip + ":" + this.port + " ...")
 		err := http.ListenAndServe(this.ip+":"+this.port, nil)
 		if err != nil {
-			valog.OBLog.LogMessage("服务器启动失败！" + err.Error())
+			valog.OBLog.LogMessage("WebSocket服务器启动失败！" + err.Error())
+			this.OnError(err)
+			return
 		}
 	} else {
 		// 通过普通SocketTCP连接
@@ -85,6 +98,7 @@ func (this *NaviConnect) Listen() {
 		server, err := net.ListenTCP("tcp", addr)
 		if err != nil {
 			valog.OBLog.LogMessage("Socket服务器启动失败！" + err.Error())
+			this.OnError(err)
 			return
 		}
 		// 侦听
