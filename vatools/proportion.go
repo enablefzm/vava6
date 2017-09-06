@@ -5,6 +5,55 @@ import (
 	"fmt"
 )
 
+type BaseProportion struct {
+	maxProportion int
+	mpValue       map[interface{}]proportionValue
+}
+
+func NewBaseProportion(iMax int, mpProValue map[interface{}]int) *BaseProportion {
+	pt := &BaseProportion{
+		maxProportion: iMax,
+	}
+	pt.InitValue(mpProValue)
+	return pt
+}
+
+func (this *BaseProportion) InitValue(mpProValue map[interface{}]int) {
+	var iCount int
+	for _, v := range mpProValue {
+		iCount += v
+	}
+	var dCount float64 = float64(iCount)
+	var dMax float64 = float64(this.maxProportion)
+	var tMin uint16 = 0
+	// 计算占比
+	this.mpValue = make(map[interface{}]proportionValue, len(mpProValue))
+	for k, v := range mpProValue {
+		r := float64(v) / dCount * dMax
+		tMax := uint16(r) + tMin
+		this.mpValue[k] = proportionValue{
+			min: tMin,
+			max: tMax,
+		}
+		tMin = tMax
+	}
+}
+
+func (this *BaseProportion) GetRndKey() interface{} {
+	for k, v := range this.mpValue {
+		fmt.Println(k, v.min, " - ", v.max)
+	}
+	intVal := uint16(CRnd(0, this.maxProportion))
+	var result interface{}
+	for k, v := range this.mpValue {
+		result = k
+		if intVal >= v.min && intVal <= v.max {
+			return k
+		}
+	}
+	return result
+}
+
 // 比例分布运算
 type Proportion struct {
 	maxProportion uint16                     // 占比最大值
@@ -52,7 +101,7 @@ func (this *Proportion) GetInfo() map[string]string {
 
 // 通过占比值返回随机Key
 func (this *Proportion) GetRndKey() string {
-	intVal := uint16(CRnd(1, int(this.maxProportion)))
+	intVal := uint16(CRnd(0, int(this.maxProportion)))
 	var result string
 	for k, v := range this.mpValue {
 		result = k
