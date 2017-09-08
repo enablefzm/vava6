@@ -40,9 +40,6 @@ func (this *BaseProportion) InitValue(mpProValue map[interface{}]int) {
 }
 
 func (this *BaseProportion) GetRndKey() interface{} {
-	for k, v := range this.mpValue {
-		fmt.Println(k, v.min, " - ", v.max)
-	}
 	intVal := uint16(CRnd(0, this.maxProportion))
 	var result interface{}
 	for k, v := range this.mpValue {
