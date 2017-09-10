@@ -5,10 +5,6 @@ import (
 	"sync"
 )
 
-//	type IFCreateMapObject interface {
-//		Create()
-//	}
-
 type VaMap struct {
 	mp map[interface{}]interface{}
 	lk *sync.RWMutex
@@ -37,9 +33,12 @@ func (this *VaMap) Get(key interface{}) (value interface{}, ok bool) {
 
 // 通过缓存获取指定Key的对象
 //	@parames
-//		key			interface{}						要获取的关键key
-//		fnCreate	func() (interface{}, error)		如果没有这个对象则创建这个对象的方法
-func (this *VaMap) GetCache(key interface{}, fnCreate func() (interface{}, error)) (interface{}, error) {
+//		key			interface{}									要获取的关键key
+//		fnCreate	func(k interface{}) (interface{}, error)	如果没有这个对象则创建这个对象的方法
+//	@return
+//		interface{}
+//		error
+func (this *VaMap) GetCache(key interface{}, fnCreate func(k interface{}) (interface{}, error)) (interface{}, error) {
 	if res, ok := this.Get(key); ok {
 		return res, nil
 	}
@@ -52,7 +51,7 @@ func (this *VaMap) GetCache(key interface{}, fnCreate func() (interface{}, error
 		return res, nil
 	}
 	// 第二次还是没有获取到则创建一个新对象
-	v, err := fnCreate()
+	v, err := fnCreate(key)
 	if err == nil {
 		this.mp[key] = v
 	}
@@ -61,30 +60,10 @@ func (this *VaMap) GetCache(key interface{}, fnCreate func() (interface{}, error
 }
 
 func (this *VaMap) GetCacheOnFunc(key interface{}) (interface{}, error) {
-	if res, ok := this.Get(key); ok {
-		return res, nil
-	}
-	// 创建对象
-	this.lk.Lock()
-	// 在锁住状态进行第二次获取
-	res, ok := this.mp[key]
-	if ok {
-		this.lk.Unlock()
-		return res, nil
-	}
-
-	// 判断是否有这个函数存在
 	if this.fc == nil {
 		return nil, fmt.Errorf("No func")
 	}
-	// 第二次还是没有获取到则创建一个新对象
-	v, err := this.fc(key)
-
-	if err == nil {
-		this.mp[key] = v
-	}
-	this.lk.Unlock()
-	return v, err
+	return this.GetCache(key, this.fc)
 }
 
 func (this *VaMap) SetFc(fc func(key interface{}) (interface{}, error)) {
