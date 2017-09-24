@@ -16,14 +16,18 @@ func NewDBStorage(ptr IFStorage) *DBStorage {
 //	@return
 //		error
 func (this *DBStorage) Save(ptrTarget IFTargetDB) error {
-	if ptrTarget.IsNew() {
-		if idx, err := this.Insert(ptrTarget.GetTableName(), ptrTarget.GetSave()); err != nil {
+	saveInfo := ptrTarget.GetSaveDB()
+	if saveInfo.IsNew {
+		if idx, err := this.Insert(saveInfo.TableName, saveInfo.MpSave); err != nil {
 			return err
 		} else {
-			ptrTarget.SetIdx(int(idx))
+			ptrTarget.SetIdx(uint(idx))
 		}
 	} else {
-		if _, err := this.Update(ptrTarget.GetTableName(), ptrTarget.GetSave(), ptrTarget.GetKeys()); err != nil {
+		for k, _ := range saveInfo.MpKeys {
+			delete(saveInfo.MpSave, k)
+		}
+		if _, err := this.Update(saveInfo.TableName, saveInfo.MpSave, saveInfo.MpKeys); err != nil {
 			return err
 		}
 	}
