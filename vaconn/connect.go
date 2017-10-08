@@ -73,6 +73,10 @@ func (this *NaviConnect) SetOnCountFunc(handleFunc func() string) {
 	this.onCount = handleFunc
 }
 
+func (this *NaviConnect) SetLinkFunc(handleFunc func(MConn)) {
+	this.onfunc = handleFunc
+}
+
 func (this *NaviConnect) Listen() {
 	// 如果是WEBSocket运行WEBSocket
 	if this.connType == TypeWEBSocket {
