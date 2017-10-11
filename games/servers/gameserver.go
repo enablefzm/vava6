@@ -10,6 +10,7 @@ import (
 const (
 	SER_STOP   = 0
 	SER_RUNING = 1
+	SER_PAUSE  = 2
 )
 
 func NewGameServer(g Game) *GameServer {
@@ -36,6 +37,7 @@ type GameServer struct {
 	chMovePlayer chan Player             // 删除玩家连接对象
 	game         Game                    // 游戏对象 - 可以加载不同类型的游戏
 	mpPlayer     map[vaconn.MConn]Player // 存放已建连接但是未验证登入的玩家连接对象
+	isPause      bool                    // 暂停标记
 }
 
 // 一次加载所有连接对象
@@ -52,6 +54,17 @@ func (this *GameServer) AddSocket(conn *vaconn.NaviConnect) {
 	conn.SetError(this.onConnError)
 	// 添加到当前游戏服务的连接器中
 	this.scks = append(this.scks, conn)
+}
+
+// 暂停玩家连接
+func (this *GameServer) Pause() {
+	this.state = SER_PAUSE
+	this.isPause = true
+}
+
+func (this *GameServer) Resume() {
+	this.state = SER_RUNING
+	this.isPause = false
 }
 
 // 执行停止游戏服务
@@ -97,6 +110,9 @@ func (this *GameServer) onConnError(err error) {
 // 新玩家连接进入游戏
 func (this *GameServer) handleNewPlayer(conn vaconn.MConn) {
 	defer conn.Close()
+	if this.isPause {
+		return
+	}
 	player := this.game.CreatePlayer(conn)
 	fmt.Println(player.GetID(), "连接进入")
 	// 添加到未登入玩家对象

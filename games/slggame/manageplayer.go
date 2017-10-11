@@ -12,7 +12,7 @@ func init() {
 	go ptrManagePlayer.run()
 }
 
-func GetFactoryPlayer() *ManagePlayer {
+func GetManagePlayers() *ManagePlayer {
 	return ptrManagePlayer
 }
 
@@ -39,6 +39,14 @@ func (this *ManagePlayer) run() {
 					delete(this.loginPlayer, p.GetID())
 				}
 			}
+		case findInfo := <-this.chFindPlayer:
+			id := findInfo.id
+			p, ok := this.loginPlayer[id]
+			if ok {
+				findInfo.ch <- p
+			} else {
+				findInfo.ch <- nil
+			}
 		}
 	}
 }
@@ -49,10 +57,19 @@ func (this *ManagePlayer) Find(id uint) (*Player, bool) {
 		ch: make(chan *Player, 0),
 	}
 	this.chFindPlayer <- f
+	// 会被阻塞
 	p := <-f.ch
 	if p != nil {
 		return p, true
 	} else {
 		return nil, false
 	}
+}
+
+func (this *ManagePlayer) AddPlayer(p *Player) {
+	this.chAddPlayer <- p
+}
+
+func (this *ManagePlayer) MovePlayer(p *Player) {
+	this.chMovePlayer <- p
 }

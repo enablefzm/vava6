@@ -39,6 +39,10 @@ func (this *Game) SetGameServer(gs *servers.GameServer) {
 	this.gs = gs
 }
 
+func (this *Game) GetGameServer() *servers.GameServer {
+	return this.gs
+}
+
 func (this *Game) CreatePlayer(conn vaconn.MConn) servers.Player {
 	return NewPlayer(conn)
 }

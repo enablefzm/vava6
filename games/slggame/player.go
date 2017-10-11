@@ -29,6 +29,10 @@ func (this *Player) GetCONN() vaconn.MConn {
 	return this.conn
 }
 
+func (this *Player) Send(msg string) error {
+	return this.conn.Send(msg)
+}
+
 func (this *Player) GetID() uint {
 	return this.id
 }
