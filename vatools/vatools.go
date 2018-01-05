@@ -120,6 +120,18 @@ func MapToJson(mpInfo map[string]interface{}) string {
 	return string(btInfo)
 }
 
+func Json(source interface{}) (string, error) {
+	if btVal, err := json.Marshal(source); err != nil {
+		return "", err
+	} else {
+		return string(btVal), nil
+	}
+}
+
+func UnJson(strJson string, sTypeOB interface{}) error {
+	return json.Unmarshal([]byte(strJson), &sTypeOB)
+}
+
 // 获取当前目录
 func GetNowPath() (string, error) {
 	file, err := exec.LookPath(os.Args[0])
