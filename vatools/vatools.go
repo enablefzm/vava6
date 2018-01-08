@@ -120,6 +120,15 @@ func MapToJson(mpInfo map[string]interface{}) string {
 	return string(btInfo)
 }
 
+func JsonToMap(strJson string) map[string]interface{} {
+	var res map[string]interface{}
+	err := UnJson(strJson, &res)
+	if err != nil || res == nil {
+		return map[string]interface{}{}
+	}
+	return res
+}
+
 func Json(source interface{}) (string, error) {
 	if btVal, err := json.Marshal(source); err != nil {
 		return "", err
