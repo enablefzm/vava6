@@ -11,6 +11,10 @@ import (
 const (
 	TypeWEBSocket = "WEBSocket"
 	TypeSocket    = "Socket"
+
+	SERVER_SOCKET     = "Socket"
+	SERVER_WEB_SOCKET = "WEBSocket"
+	CLIENT_SOCKET     = "client_socket"
 )
 
 func NewNaviConnect(nType, sPort, sIp string, onLinkFunc func(MConn)) *NaviConnect {
@@ -79,7 +83,8 @@ func (this *NaviConnect) SetLinkFunc(handleFunc func(MConn)) {
 
 func (this *NaviConnect) Listen() {
 	// 如果是WEBSocket运行WEBSocket
-	if this.connType == TypeWEBSocket {
+	switch this.connType {
+	case SERVER_WEB_SOCKET:
 		// 注册
 		http.Handle("/", websocket.Handler(this.onWebSocket))
 		http.HandleFunc("/count", this.CountPlayer)
@@ -91,7 +96,7 @@ func (this *NaviConnect) Listen() {
 			this.OnError(err)
 			return
 		}
-	} else {
+	case SERVER_SOCKET:
 		// 通过普通SocketTCP连接
 		addr, err := net.ResolveTCPAddr("tcp", this.ip+":"+this.port)
 		if err != nil {
@@ -116,7 +121,27 @@ func (this *NaviConnect) Listen() {
 			// 移交给协程处理
 			go this.onSocket(conn)
 		}
+
+	// 客户端连接到服务端
+	case CLIENT_SOCKET:
+		addr, err := net.ResolveTCPAddr("tcp", this.ip+":"+this.port)
+		if err != nil {
+			valog.OBLog.LogMessage("IP地址转换失败：" + err.Error())
+			return
+		}
+		clientConn, err := net.DialTCP("tcp", nil, addr)
+		if err != nil {
+			valog.OBLog.LogMessage("连接服务器连接失败！" + err.Error())
+			this.OnError(err)
+			return
+		}
+		valog.OBLog.LogMessage("连接服务器成功！")
+		// 交给onFunc处理
+		go this.onSocket(clientConn)
 	}
+	//	if this.connType == TypeWEBSocket {
+	//	} else {
+	//	}
 	valog.OBLog.LogMessage("侦听结束")
 }
 
@@ -124,7 +149,7 @@ func (this *NaviConnect) Listen() {
 type MConn interface {
 	Send(msg string) error // 发送
 	Read() (string, error) // 接送
-	Close()                // 关闭
+	Close() error          // 关闭
 	GetIPInfo() string     // 获取IP地址
 }
 
@@ -150,8 +175,8 @@ func (this *WebSocketConn) Read() (string, error) {
 	return str, err
 }
 
-func (this *WebSocketConn) Close() {
-	this.Conn.Close()
+func (this *WebSocketConn) Close() error {
+	return this.Conn.Close()
 }
 
 func (this *WebSocketConn) GetIPInfo() string {
@@ -179,7 +204,7 @@ func (this *SocketConn) Send(msg string) error {
 }
 
 func (this *SocketConn) Read() (string, error) {
-	data := make([]byte, 0)
+	data := make([]byte, 0, 1024)
 	bufData := make([]byte, this.bufLen)
 	var err error
 	for {
@@ -204,8 +229,8 @@ func (this *SocketConn) Read() (string, error) {
 	return string(data), err
 }
 
-func (this *SocketConn) Close() {
-	this.Conn.Close()
+func (this *SocketConn) Close() error {
+	return this.Conn.Close()
 }
 
 func (this *SocketConn) GetIPInfo() string {
