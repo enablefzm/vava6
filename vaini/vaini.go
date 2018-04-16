@@ -109,6 +109,7 @@ func (c *Config) ReadList() []map[string]map[string]string {
 	var data map[string]map[string]string = make(map[string]map[string]string, 10)
 	var section string
 	buf := bufio.NewReader(file)
+	isFirst := true
 	for {
 		l, err := buf.ReadString('\n')
 		line := strings.TrimSpace(l)
@@ -120,6 +121,17 @@ func (c *Config) ReadList() []map[string]map[string]string {
 				break
 			}
 		}
+		// 如果是第一次读取
+		if isFirst {
+			isFirst = false
+			btLine := []byte(line)
+			if len(btLine) >= 3 {
+				if btLine[0] == 239 && btLine[1] == 187 && btLine[2] == 191 {
+					nBtLine := btLine[3:]
+					line = string(nBtLine)
+				}
+			}
+		}
 		switch {
 		case len(line) == 0:
 		case string(line[0]) == "#": //增加配置文件备注
@@ -129,14 +141,16 @@ func (c *Config) ReadList() []map[string]map[string]string {
 			data[section] = make(map[string]string)
 		default:
 			i := strings.IndexAny(line, "=")
-			value := strings.TrimSpace(line[i+1 : len(line)])
-			valKey := strings.TrimSpace(line[0:i])
-			if _, ok := data[section]; !ok {
-				data[section] = make(map[string]string, 2)
-			}
-			data[section][valKey] = value
-			if c.uniquappend(section) == true {
-				c.conflist = append(c.conflist, data)
+			if i > 0 {
+				value := strings.TrimSpace(line[i+1 : len(line)])
+				valKey := strings.TrimSpace(line[0:i])
+				if _, ok := data[section]; !ok {
+					data[section] = make(map[string]string, 2)
+				}
+				data[section][valKey] = value
+				if c.uniquappend(section) == true {
+					c.conflist = append(c.conflist, data)
+				}
 			}
 		}
 
