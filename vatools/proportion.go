@@ -115,6 +115,7 @@ type proportionValue struct {
 }
 
 // 创建可以被获取的分布运算
+// 创建物品后会被一直取数据的值为0时将会被清除
 type CanGetProportion struct {
 	pro   *Proportion
 	value map[string]int
