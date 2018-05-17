@@ -4,16 +4,16 @@ import (
 	"sync"
 )
 
-var mpCmds = make(map[string]func(*Game, *Player, string, []string), 100)
+var mpCmds = make(map[string]func(*Game, *Player, string, []string) string, 100)
 var lk = new(sync.Mutex)
 
-func RegCmd(cmdName string, fc func(*Game, *Player, string, []string)) {
+func RegCmd(cmdName string, fc func(*Game, *Player, string, []string) string) {
 	lk.Lock()
 	mpCmds[cmdName] = fc
 	lk.Unlock()
 }
 
-func GetCMD(cmdName string) (func(*Game, *Player, string, []string), bool) {
+func GetCMD(cmdName string) (func(*Game, *Player, string, []string) string, bool) {
 	fc, ok := mpCmds[cmdName]
 	return fc, ok
 }

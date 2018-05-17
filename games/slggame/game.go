@@ -14,8 +14,13 @@ var obGame *Game
 
 // 游戏逻辑对象
 type IFGameLogic interface {
+	// 命令解析操作
 	OperateCmd(g *Game, p *Player, cmd string, args []string)
+	// 玩家断开连接时处理
 	DisconnectPlayer(p *Player)
+	// 新连接进入游戏时处理
+	HandleNewConnect(conn vaconn.MConn)
+	// 保存
 	Save() error
 }
 
@@ -44,6 +49,7 @@ func (this *Game) GetGameServer() *servers.GameServer {
 }
 
 func (this *Game) CreatePlayer(conn vaconn.MConn) servers.Player {
+	this.gameLogic.HandleNewConnect(conn)
 	return NewPlayer(conn)
 }
 

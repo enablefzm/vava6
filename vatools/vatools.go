@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -63,16 +64,36 @@ func MD5(str string) string {
 }
 
 func SUint(val string) uint {
-	return uint(SInt(val))
+	v := SInt(val)
+	if v < 0 {
+		return 0
+	}
+	return uint(v)
+}
+
+func SUint8(val string) uint8 {
+	v := SInt(val)
+	if v < 0 {
+		return 0
+	}
+	return uint8(v)
 }
 
 // 将字符串转为UInt16
 func SUint16(val string) uint16 {
-	return uint16(SInt(val))
+	v := SInt(val)
+	if v < 0 {
+		return 0
+	}
+	return uint16(v)
 }
 
-func SUint8(val string) uint8 {
-	return uint8(SInt(val))
+func SUint32(val string) uint32 {
+	v := SInt64(val)
+	if v < 0 {
+		return 0
+	}
+	return uint32(v)
 }
 
 func SInt64(val string) int64 {
@@ -90,6 +111,10 @@ func SInt(val string) int {
 		return 0
 	}
 	return v
+}
+
+func operateUintNumber(val string) string {
+	return strings.Replace(val, "-", "", -1)
 }
 
 // 将时间格式字符串转换为时间对象

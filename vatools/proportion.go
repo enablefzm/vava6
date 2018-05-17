@@ -39,6 +39,7 @@ func (this *BaseProportion) InitValue(mpProValue map[interface{}]int) {
 	}
 }
 
+// 返回Key，如果当前map值为空则返回的key为 nil
 func (this *BaseProportion) GetRndKey() interface{} {
 	intVal := uint16(CRnd(0, this.maxProportion))
 	var result interface{}
@@ -49,6 +50,47 @@ func (this *BaseProportion) GetRndKey() interface{} {
 		}
 	}
 	return result
+}
+
+func NewRangeProportion(iMax int, mpValue map[interface{}]int) *RangeProportion {
+	return &RangeProportion{
+		iMax:    iMax,
+		iLen:    len(mpValue),
+		mpValue: mpValue,
+	}
+}
+
+type RangeProportion struct {
+	iMax    int
+	iLen    int
+	mpValue map[interface{}]int
+}
+
+func (this *RangeProportion) GetRangeKeys(how uint16) []interface{} {
+	res := make([]interface{}, 0, how)
+	if this.iLen < 1 || how < 1 {
+		return res
+	}
+	if int(how) > this.iLen {
+		how = uint16(this.iLen)
+	}
+	newMp := make(map[interface{}]int, this.iLen)
+	for k, v := range this.mpValue {
+		newMp[k] = v
+	}
+	ptrPorportion := NewBaseProportion(this.iMax, newMp)
+	var i uint16 = 0
+	for ; i < how; i++ {
+		if len(newMp) < 1 {
+			break
+		}
+		k := ptrPorportion.GetRndKey()
+		res = append(res, k)
+		// 删除当前的K
+		delete(newMp, k)
+		ptrPorportion.InitValue(newMp)
+	}
+	return res
 }
 
 // 比例分布运算
