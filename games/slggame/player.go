@@ -2,6 +2,7 @@ package slggame
 
 import (
 	"fmt"
+	"strings"
 	"vava6/vaconn"
 )
 
@@ -13,6 +14,7 @@ func NewPlayer(conn vaconn.MConn) *Player {
 
 type Player struct {
 	id      uint
+	uid     string
 	conn    vaconn.MConn
 	isLogin bool
 }
@@ -39,6 +41,14 @@ func (this *Player) GetID() uint {
 
 func (this *Player) SetID(id uint) {
 	this.id = id
+}
+
+func (this *Player) SetUID(uid string) {
+	this.uid = strings.ToLower(uid)
+}
+
+func (this *Player) GetUID() string {
+	return this.uid
 }
 
 func (this *Player) HandleConnClose() {
