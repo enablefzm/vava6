@@ -6,6 +6,10 @@ import (
 	"vava6/vaconn"
 )
 
+type IFRes interface {
+	GetString() string
+}
+
 func NewPlayer(conn vaconn.MConn) *Player {
 	return &Player{
 		conn: conn,
@@ -33,6 +37,10 @@ func (this *Player) GetCONN() vaconn.MConn {
 
 func (this *Player) Send(msg string) error {
 	return this.conn.Send(msg)
+}
+
+func (this *Player) SendRes(res IFRes) error {
+	return this.conn.Send(res.GetString())
 }
 
 func (this *Player) GetID() uint {

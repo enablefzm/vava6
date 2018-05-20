@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -48,7 +47,7 @@ func NewDBs(dbName, dbIp, dbPort, dbUser, dbPass string, maxConn, minConn int) (
 	}
 	resDB.db.SetMaxOpenConns(maxConn)
 	resDB.db.SetMaxIdleConns(minConn)
-	// fmt.Println("构造了DB")
+	fmt.Println("构造了DB")
 	return resDB, err
 }
 
@@ -160,29 +159,30 @@ func (d *DBs) Update(table string, info, key map[string]interface{}) (sql.Result
 		if len(field) < 1 {
 			field = k + "=?"
 		} else {
-			field += "," + k + "=?"
+			field = fmt.Sprint(field, ",", k, "=?")
 		}
 		i++
 	}
 	var where string
 	j := 0
 	for k, v := range key {
-		value, ok := v.(int)
 		if j > 0 {
 			where += " AND "
 		}
-		if ok {
-			where += k + "=" + strconv.Itoa(value)
-		} else if sv, ok := v.(string); ok {
-			where += k + "='" + sv + "'"
-		} else {
+		switch value := v.(type) {
+		case int, uint:
+			where = fmt.Sprint(where, k, "=", value)
+			//          where = fmt.Sprint(where, k, "=", strconv.Itoa(value))
+			//		case uint:
+			//			where = fmt.Sprint(where, k, "=", strconv.FormatUint(uint64(value), 10))
+		case string:
+			where = fmt.Sprint(where, k, "='", value, "'")
+		default:
 			return nil, errors.New("KEY参数错误")
 		}
 		j++
-		// vArr[i] = v
 	}
-	strSql := "UPDATE " + table + " SET " + field + " WHERE " + where
-	// fmt.Println("SQLDB Update:", strSql)
+	strSql := fmt.Sprint("UPDATE ", table, " SET ", field, " WHERE ", where) // "UPDATE " + table + " SET " + field + " WHERE " + where
 	stmt, err := d.db.Prepare(strSql)
 	if err != nil {
 		return nil, err

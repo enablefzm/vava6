@@ -4,7 +4,6 @@ package vdb
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"vava6/mysql"
 )
@@ -22,11 +21,12 @@ type MySql struct {
 func (this *MySql) Querys(table string, keys map[string]interface{}) ([]map[string]string, error) {
 	arrKey := make([]string, 0, len(keys))
 	for k, v := range keys {
-		if value, ok := v.(int); ok {
-			arrKey = append(arrKey, k+"="+strconv.Itoa(value))
-		} else if sv, ok := v.(string); ok {
-			arrKey = append(arrKey, k+"='"+sv+"'")
-		} else {
+		switch value := v.(type) {
+		case int, uint:
+			arrKey = append(arrKey, fmt.Sprint(k, "=", value))
+		case string:
+			arrKey = append(arrKey, fmt.Sprint(k, "='", value, "'"))
+		default:
 			return nil, fmt.Errorf("querys key error.")
 		}
 	}

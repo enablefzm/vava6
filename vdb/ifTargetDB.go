@@ -20,7 +20,6 @@ type SaveInfo struct {
 type IFTargetDB interface {
 	// 获取要被存储的信息
 	GetSaveDB() *SaveInfo
-
 	// 设定为不是新增对象
 	SetIdx(id uint)
 }
