@@ -1,7 +1,6 @@
 package dbstorage
 
 import (
-	"fmt"
 	"sync"
 	"vava6/mysql"
 	"vava6/vdb"
@@ -52,7 +51,7 @@ func GetStorage() (*vdb.DBStorage, error) {
 			pkMySql := vdb.NewMySql(ptrMySql)
 			// 生成对象
 			dbStorage = vdb.NewDBStorage(pkMySql)
-			fmt.Println("构造了dbStorage")
+			// fmt.Println("构造了dbStorage")
 		}
 	}
 	return dbStorage, nil
