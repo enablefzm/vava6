@@ -20,6 +20,10 @@ const (
 	TIME_FORMAT = "2006-01-02 15:04:05"
 )
 
+func init() {
+	rand.Seed(int64(time.Now().Nanosecond()))
+}
+
 func CRnd(min, max int) int {
 	if max <= min {
 		return min
@@ -104,6 +108,22 @@ func SInt64(val string) int64 {
 	return v
 }
 
+func SFloat64(val string) float64 {
+	v, err := strconv.ParseFloat(val, 64)
+	if err != nil {
+		return 0
+	}
+	return v
+}
+
+func SFloat32(val string) float32 {
+	v, err := strconv.ParseFloat(val, 32)
+	if err != nil {
+		return 0
+	}
+	return float32(v)
+}
+
 // 转为int值
 func SInt(val string) int {
 	v, err := strconv.Atoi(val)
@@ -131,10 +151,6 @@ func GetNowTimeString() string {
 
 func GetTimeString(intTime int64) string {
 	return time.Unix(intTime, 0).Format(TIME_FORMAT)
-}
-
-func init() {
-	rand.Seed(int64(time.Now().Nanosecond()))
 }
 
 func MapToJson(mpInfo map[string]interface{}) string {

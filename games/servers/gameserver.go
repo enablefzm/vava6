@@ -92,11 +92,11 @@ func (this *GameServer) Start() {
 		// 放入建立接接但未登入游戏的玩家
 		case p := <-this.chAddPlayer:
 			this.mpPlayer[p.GetCONN()] = p
-			this.ShowCountPlayer()
+			// this.ShowCountPlayer()
 		// 移除未登入游戏
 		case p := <-this.chMovePlayer:
 			delete(this.mpPlayer, p.GetCONN())
-			this.ShowCountPlayer()
+			// this.ShowCountPlayer()
 		}
 	}
 }
@@ -114,7 +114,7 @@ func (this *GameServer) handleNewPlayer(conn vaconn.MConn) {
 		return
 	}
 	player := this.game.CreatePlayer(conn)
-	fmt.Println(player.GetID(), "连接进入")
+	// fmt.Println(player.GetID(), "连接进入")
 	// 添加到未登入玩家对象
 	this.AddPlayer(player)
 	for {
@@ -126,17 +126,21 @@ func (this *GameServer) handleNewPlayer(conn vaconn.MConn) {
 				// 非正常断开连接
 			}
 			player.HandleConnClose()
-			fmt.Println(player.GetID(), "断开连接")
+			// fmt.Println(player.GetID(), "断开连接")
 			// 删除当前的连接对象
 			this.MovePlayer(player)
 			return
 		}
-		strCmd = strings.Trim(strCmd, "\n\r")
-		if len(strCmd) == 0 {
-			continue
+
+		arrCmds := strings.Split(strCmd, "\r\n")
+		// 转交给命令对象处理
+		for _, cmd := range arrCmds {
+			if len(cmd) < 1 {
+				continue
+			}
+			// 转交给游戏处理消息
+			this.game.DoCmd(player, cmd)
 		}
-		// 转交给游戏处理消息
-		this.game.DoCmd(player, strCmd)
 	}
 }
 

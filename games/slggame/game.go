@@ -1,7 +1,7 @@
 package slggame
 
 import (
-	"fmt"
+	// "fmt"
 	"strings"
 	"vava6/games/servers"
 	"vava6/vaconn"
@@ -54,7 +54,7 @@ func (this *Game) CreatePlayer(conn vaconn.MConn) servers.Player {
 }
 
 func (this *Game) DoCmd(p servers.Player, cmd string) {
-	fmt.Println(p.GetCONN(), " 收到命令 ", cmd)
+	// fmt.Println(p.GetCONN(), " 收到命令 ", cmd)
 	if np, ok := p.(*Player); ok {
 		arrc := strings.Split(cmd, " ")
 		c := arrc[0]

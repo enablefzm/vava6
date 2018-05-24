@@ -47,7 +47,7 @@ func NewDBs(dbName, dbIp, dbPort, dbUser, dbPass string, maxConn, minConn int) (
 	}
 	resDB.db.SetMaxOpenConns(maxConn)
 	resDB.db.SetMaxIdleConns(minConn)
-	fmt.Println("构造了DB")
+	// fmt.Println("构造了DB")
 	return resDB, err
 }
 
