@@ -22,6 +22,8 @@ type Player interface {
 	GetCONN() vaconn.MConn
 	// 获取ID
 	GetID() uint
+	// 获取UID
+	GetUID() string
 	// 断开事件处理
 	HandleConnClose()
 }

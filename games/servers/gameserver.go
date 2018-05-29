@@ -157,5 +157,6 @@ func (this *GameServer) GetLinkCount() int {
 }
 
 func (this *GameServer) ShowCountPlayer() {
-	fmt.Println("当前玩家数", len(this.mpPlayer))
+	fmt.Println("GameServer当前连接进入的玩家：", len(this.mpPlayer))
+	// fmt.Println("当前已登入玩家：", len(this.mpLoginPlayer))
 }
