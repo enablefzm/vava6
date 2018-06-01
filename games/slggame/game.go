@@ -1,8 +1,6 @@
 package slggame
 
 import (
-	"fmt"
-	// "fmt"
 	"strings"
 	"vava6/games/servers"
 	"vava6/vaconn"
@@ -72,6 +70,5 @@ func (this *Game) Save() error {
 // slggame里的玩家断开连接处理
 // 	 桥接到游戏逻辑里的玩家断开处理
 func (this *Game) DisconnectPlayer(p *Player) {
-	fmt.Println("SlgGame里的玩家断开处理：", p.GetUID())
 	this.gameLogic.DisconnectPlayer(p)
 }
