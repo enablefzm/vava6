@@ -197,9 +197,6 @@ func (this *SocketConn) Send(msg string) error {
 		return nil
 	}
 	_, err := this.Conn.Write([]byte(msg + "\n\r"))
-	if err != nil {
-		valog.OBLog.LogMessage(err.Error())
-	}
 	return err
 }
 

@@ -125,7 +125,7 @@ func (this *GameServer) handleNewPlayer(conn vaconn.MConn) {
 			} else {
 				// 非正常断开连接
 			}
-			// fmt.Println(player.GetID(), "断开连接", player.GetCONN().GetIPInfo())
+			// fmt.Println(player.GetID(), "玩家连接被断开了", player.GetCONN().GetIPInfo())
 			player.HandleConnClose()
 			// 删除当前的连接对象
 			this.MovePlayer(player)

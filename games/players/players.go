@@ -10,6 +10,7 @@ var ptManagePlayer *ManagePlayer = &ManagePlayer{
 	mpLoginPlayer: make(map[string]servers.Player, 1000),
 	chAdd:         make(chan servers.Player, 1000),
 	chMove:        make(chan servers.Player, 1000),
+	chGet:         make(chan *proGet, 1000),
 }
 
 func init() {
