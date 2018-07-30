@@ -22,7 +22,7 @@ func (this *MySql) Querys(table string, keys map[string]interface{}) ([]map[stri
 	arrKey := make([]string, 0, len(keys))
 	for k, v := range keys {
 		switch value := v.(type) {
-		case int, uint:
+		case int, uint, int16:
 			arrKey = append(arrKey, fmt.Sprint(k, "=", value))
 		case string:
 			arrKey = append(arrKey, fmt.Sprint(k, "='", value, "'"))
@@ -30,7 +30,10 @@ func (this *MySql) Querys(table string, keys map[string]interface{}) ([]map[stri
 			return nil, fmt.Errorf("querys key error.")
 		}
 	}
-	strKey := strings.Join(arrKey, " AND ")
+	strKey := ""
+	if len(arrKey) > 0 {
+		strKey = strings.Join(arrKey, " AND ")
+	}
 	return this.ptrDBs.Querys("*", table, strKey)
 }
 
