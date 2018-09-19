@@ -1,7 +1,6 @@
 package slggame
 
 import (
-	"fmt"
 	"strings"
 	"vava6/vaconn"
 )
@@ -60,6 +59,6 @@ func (this *Player) GetUID() string {
 }
 
 func (this *Player) HandleConnClose() {
-	fmt.Println("slggame player 断开连接处理")
+	// fmt.Println("slggame player 断开连接处理")
 	obGame.DisconnectPlayer(this)
 }

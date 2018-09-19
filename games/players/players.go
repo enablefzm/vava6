@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"vava6/games/msg"
 	"vava6/games/servers"
+	"vava6/valog"
 )
 
 var ptManagePlayer *ManagePlayer = &ManagePlayer{
@@ -90,6 +91,8 @@ func (this *ManagePlayer) Run() {
 			}
 			this.mpLoginPlayer[p.GetUID()] = p
 			this.mpLoginPlayerOnID[p.GetID()] = p
+			// 登入游戏
+			valog.OBLog.LogMessage(fmt.Sprintf("%s->【%s】登入游戏", p.GetCONN().GetIPInfo(), p.GetUID()))
 		case p := <-this.chMove:
 			if oldP, ok := this.mpLoginPlayer[p.GetUID()]; ok {
 				if oldP == p {
