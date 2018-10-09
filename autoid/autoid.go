@@ -2,7 +2,29 @@ package autoid
 
 import (
 	"sync"
+	"vava6/vatools"
 )
+
+func NewAutoID() *AutoID {
+	return &AutoID{
+		cacheID: make([]int, 0, 20),
+		lk:      new(sync.Mutex),
+	}
+}
+
+func NewAutoIDOnJson(strJson string) *AutoID {
+	db := &AutoIdDB{}
+	vatools.UnJson(strJson, db)
+	return NewAutoIDOnDb(db)
+}
+
+func NewAutoIDOnDb(db *AutoIdDB) *AutoID {
+	return &AutoID{
+		cacheID: db.CacheID,
+		lastID:  db.LastID,
+		lk:      new(sync.Mutex),
+	}
+}
 
 type AutoID struct {
 	lastID  int
@@ -31,13 +53,15 @@ func (this *AutoID) PutID(id int) {
 	this.lk.Unlock()
 }
 
-func NewAutoID() *AutoID {
-	return &AutoID{
-		cacheID: make([]int, 0, 20),
-		lk:      new(sync.Mutex),
-	}
+func (this *AutoID) GetJsonSave() string {
+	db := this.GetDbSave()
+	strJson, _ := vatools.Json(db)
+	return strJson
 }
 
-func NewAutoIDOnJson(strJson string) *AutoID {
-
+func (this *AutoID) GetDbSave() *AutoIdDB {
+	return &AutoIdDB{
+		CacheID: this.cacheID,
+		LastID:  this.lastID,
+	}
 }
