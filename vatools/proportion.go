@@ -52,6 +52,14 @@ func (this *BaseProportion) GetRndKey() interface{} {
 	return result
 }
 
+func (this *BaseProportion) GetAllKey() []interface{} {
+	arr := make([]interface{}, 0, len(this.mpValue))
+	for k, _ := range this.mpValue {
+		arr = append(arr, k)
+	}
+	return arr
+}
+
 func NewRangeProportion(iMax int, mpValue map[interface{}]int) *RangeProportion {
 	return &RangeProportion{
 		iMax:    iMax,
