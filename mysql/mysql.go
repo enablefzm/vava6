@@ -32,7 +32,7 @@ func NewDBs(dbName, dbIp, dbPort, dbUser, dbPass string, maxConn, minConn int) (
 		minConn: minConn,
 	}
 	var err error
-	resDB.db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&allowNativePasswords=true",
+	resDB.db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&allowNativePasswords=true",
 		resDB.dbUser,
 		resDB.dbPass,
 		resDB.dbIP,
