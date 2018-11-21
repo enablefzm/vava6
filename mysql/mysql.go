@@ -80,15 +80,8 @@ func (d *DBs) NaviQuery(field, table, key string) (map[string]string, error) {
 	return record, nil
 }
 
-// 查询多项数据库
-func (d *DBs) Querys(field, table, key string) ([]map[string]string, error) {
-	var sql string
-	if len(key) > 2 {
-		sql = fmt.Sprintf("SELECT %s FROM %s WHERE %s", field, table, key)
-	} else {
-		sql = fmt.Sprintf("SELECT %s FROM %s LIMIT 0, 5000", field, table)
-	}
-	rows, err := d.db.Query(sql)
+func (d *DBs) QuerySql(strSql string) ([]map[string]string, error) {
+	rows, err := d.db.Query(strSql)
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +106,35 @@ func (d *DBs) Querys(field, table, key string) ([]map[string]string, error) {
 		records = append(records, record)
 	}
 	return records, nil
+}
+
+func (d *DBs) QuerysLimit(field, table, key string, page, limit int, orderby string) ([]map[string]string, error) {
+	var sql string
+	if page < 1 {
+		page = 1
+	}
+	sql = fmt.Sprintf("SELECT %s FROM %s", field, table)
+	if len(key) > 0 {
+		sql = fmt.Sprintf("%s WHERE %s", sql, key)
+	}
+	if len(orderby) > 0 {
+		sql = fmt.Sprintf("%s ORDER BY %s", sql, orderby)
+	}
+	var idxLimit int = page*limit - limit
+	sql = fmt.Sprintf("%s LIMIT %d, %d", sql, idxLimit, limit)
+	fmt.Println(sql)
+	return d.QuerySql(sql)
+}
+
+// 查询多项数据库
+func (d *DBs) Querys(field, table, key string) ([]map[string]string, error) {
+	var sql string
+	if len(key) > 2 {
+		sql = fmt.Sprintf("SELECT %s FROM %s WHERE %s", field, table, key)
+	} else {
+		sql = fmt.Sprintf("SELECT %s FROM %s LIMIT 0, 5000", field, table)
+	}
+	return d.QuerySql(sql)
 }
 
 // 插入数据到数据库
