@@ -122,7 +122,7 @@ func (d *DBs) QuerysLimit(field, table, key string, page, limit int, orderby str
 	}
 	var idxLimit int = page*limit - limit
 	sql = fmt.Sprintf("%s LIMIT %d, %d", sql, idxLimit, limit)
-	fmt.Println(sql)
+	// fmt.Println(sql)
 	return d.QuerySql(sql)
 }
 
