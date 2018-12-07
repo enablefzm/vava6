@@ -194,3 +194,38 @@ func GetNowPath() (string, error) {
 	}
 	return filepath.Dir(path), nil
 }
+
+// 随机获取不重复的数值
+func GetRndInts(min, max, iCount int) []int {
+	var rndVal int
+	res := make([]int, 0, iCount)
+	if min >= max {
+		res = append(res, min)
+	} else {
+		if (max - min) <= iCount {
+			for i := min; i <= max; i++ {
+				res = append(res, i)
+			}
+		} else {
+			for i := 0; i < iCount; i++ {
+				for it := 0; it < 20; it++ {
+					// 产生随机数
+					rndVal = CRnd(min, max)
+					// 判断当前数组里是否有这个数值
+					exist := false
+					for ii := 0; ii < len(res); ii++ {
+						if res[ii] == rndVal {
+							exist = true
+							break
+						}
+					}
+					if !exist {
+						break
+					}
+				}
+				res = append(res, rndVal)
+			}
+		}
+	}
+	return res
+}
