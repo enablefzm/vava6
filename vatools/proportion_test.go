@@ -5,8 +5,14 @@ import (
 )
 
 func TestProportion(t *testing.T) {
-	arr := GetRndInts(1, 10, 8)
-	t.Log(arr)
+	for i := 0; i < 10; i++ {
+		arr := GetRndInts(1, 15000, 100)
+		tSort(arr)
+		t.Log(arr)
+	}
+}
+
+func tSort(arr []int) {
 	for i := 0; i < len(arr); i++ {
 		for j := i + 1; j < len(arr); j++ {
 			if arr[i] > arr[j] {
@@ -14,5 +20,4 @@ func TestProportion(t *testing.T) {
 			}
 		}
 	}
-	t.Log(arr)
 }
