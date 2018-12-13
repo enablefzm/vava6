@@ -44,3 +44,19 @@ func RegPool(poolKey string, fn CreateFunc) error {
 	mpPool[poolKey] = NewPool(fn)
 	return nil
 }
+
+func AddPool(poolKey string, ptPool *Pool) error {
+	lkMp.Lock()
+	mpPool[poolKey] = ptPool
+	lkMp.Unlock()
+	return nil
+}
+
+func Save() error {
+	lkMp.RLock()
+	for _, mp := range mpPool {
+		mp.Save()
+	}
+	lkMp.RUnlock()
+	return nil
+}

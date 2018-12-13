@@ -102,3 +102,15 @@ func (this *Pool) run() {
 		})
 	}
 }
+
+func (this *Pool) Save() error {
+	this.mpPool.Range(func(k, v interface{}) bool {
+		if r, ok := v.(*PoolObject); ok {
+			if err := r.Save(); err != nil {
+				// fmt.Println("保存Object出错：", err.Error())
+			}
+		}
+		return true
+	})
+	return nil
+}
