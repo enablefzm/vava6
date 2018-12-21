@@ -75,12 +75,20 @@ func SUint(val string) uint {
 	return uint(v)
 }
 
+func SInt8(val string) int8 {
+	return int8(SInt(val))
+}
+
 func SUint8(val string) uint8 {
 	v := SInt(val)
 	if v < 0 {
 		return 0
 	}
 	return uint8(v)
+}
+
+func SInt16(val string) int16 {
+	return int16(SInt(val))
 }
 
 // 将字符串转为UInt16

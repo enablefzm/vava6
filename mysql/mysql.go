@@ -156,7 +156,6 @@ func (d *DBs) Insert(table string, info map[string]interface{}) (sql.Result, err
 		i++
 	}
 	sql := "INSERT INTO " + table + "(" + field + ") VALUES(" + value + ")"
-	// fmt.Println("SQLDB Insert:", sql)
 	stmt, err := d.db.Prepare(sql)
 	defer stmt.Close()
 	if err != nil {
@@ -192,11 +191,8 @@ func (d *DBs) Update(table string, info, key map[string]interface{}) (sql.Result
 			where += " AND "
 		}
 		switch value := v.(type) {
-		case int, uint:
+		case int, uint, int64, uint64, int16, int8:
 			where = fmt.Sprint(where, k, "=", value)
-			//          where = fmt.Sprint(where, k, "=", strconv.Itoa(value))
-			//		case uint:
-			//			where = fmt.Sprint(where, k, "=", strconv.FormatUint(uint64(value), 10))
 		case string:
 			where = fmt.Sprint(where, k, "='", value, "'")
 		default:
