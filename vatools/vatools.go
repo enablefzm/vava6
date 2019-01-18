@@ -100,6 +100,10 @@ func SUint16(val string) uint16 {
 	return uint16(v)
 }
 
+func SInt32(val string) int32 {
+	return int32(SInt(val))
+}
+
 func SUint32(val string) uint32 {
 	v := SInt64(val)
 	if v < 0 {
