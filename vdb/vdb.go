@@ -27,16 +27,8 @@ func (this *DBStorage) Save(ptrTarget IFTargetDB) error {
 		for k, _ := range saveInfo.MpKeys {
 			delete(saveInfo.MpSave, k)
 		}
-		if rows, err := this.Update(saveInfo.TableName, saveInfo.MpSave, saveInfo.MpKeys); err != nil {
+		if _, err := this.Update(saveInfo.TableName, saveInfo.MpSave, saveInfo.MpKeys); err != nil {
 			return err
-		} else if rows < 1 {
-			// 更新不成功则尝试新增
-			for k, v := range saveInfo.MpKeys {
-				saveInfo.MpSave[k] = v
-			}
-			if _, err := this.Insert(saveInfo.TableName, saveInfo.MpSave); err != nil {
-				return err
-			}
 		}
 	}
 	return nil

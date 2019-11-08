@@ -59,6 +59,12 @@ func (this *Player) GetUID() string {
 }
 
 func (this *Player) HandleConnClose() {
-	// fmt.Println("slggame player 断开连接处理")
 	obGame.DisconnectPlayer(this)
+}
+
+// 设定玩家连接器的ID标识
+func (this *Player) SetLoginIdAndUid(id uint, uid string) {
+	this.SetID(id)
+	this.SetUID(uid)
+	this.SetIsLogin(true)
 }

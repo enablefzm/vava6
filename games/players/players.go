@@ -56,8 +56,12 @@ func GetPlayerOnId(id uint) (servers.Player, bool) {
 	}
 }
 
+func ListPlayer() {
+	ptManagePlayer.showCount()
+}
+
 func Count() int {
-	return 0
+	return ptManagePlayer.Count()
 }
 
 type proGet struct {
@@ -117,9 +121,18 @@ func (this *ManagePlayer) Run() {
 	}
 }
 
+func (this *ManagePlayer) Count() int {
+	return len(this.mpLoginPlayer)
+}
+
 func (this *ManagePlayer) showCount() {
-	fmt.Println("ManagePlayer当前玩家数量", len(this.mpLoginPlayer))
+	fmt.Println("ManagePlayer当前玩家数量：", this.Count())
+	i := 0
 	for k, v := range this.mpLoginPlayer {
-		fmt.Println(k, v.GetCONN().GetIPInfo())
+		fmt.Println(k, v.GetID(), v.GetCONN().GetIPInfo())
+		i++
+		if i > 30 {
+			break
+		}
 	}
 }
