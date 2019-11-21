@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	SER_STOP   = 0
-	SER_RUNING = 1
-	SER_PAUSE  = 2
+	SER_STOP    = 0
+	SER_RUNING  = 1
+	SER_PAUSE   = 2
+	SER_STOPING = 4
 )
 
 func NewGameServer(g Game) *GameServer {
@@ -38,6 +39,7 @@ type GameServer struct {
 	game         Game                    // 游戏对象 - 可以加载不同类型的游戏
 	mpPlayer     map[vaconn.MConn]Player // 存放已建连接但是未验证登入的玩家连接对象
 	isPause      bool                    // 暂停标记
+	isRunStop    bool                    // 正在运行游戏服务器停止
 }
 
 // 一次加载所有连接对象
@@ -69,13 +71,26 @@ func (this *GameServer) Resume() {
 
 // 执行停止游戏服务
 func (this *GameServer) Stop() {
+	// 执行游戏逻辑里的保存操作
 	this.CHClose <- true
+}
+
+// 延尺执行停止游戏服务器
+func (this *GameServer) LastStop(sec int) error {
+	if this.isRunStop == true {
+		return fmt.Errorf("服务器正在停止中...")
+	}
+	// 标记上停止
+	this.isRunStop = true
+	return nil
 }
 
 func (this *GameServer) Start() {
 	if this.state == SER_RUNING {
 		return
 	}
+	// 将服务器状态标记为运行状态
+	this.state = SER_RUNING
 	for _, sck := range this.scks {
 		go sck.Listen()
 	}
@@ -85,7 +100,18 @@ func (this *GameServer) Start() {
 		case blnClose := <-this.CHClose:
 			if blnClose == true {
 				close(this.CHClose)
-				// 执行关机操作
+				// 正在停止中
+				this.state = SER_STOPING
+				// 断开所有的连接
+				for _, p := range this.mpPlayer {
+					p.GetCONN().Close()
+				}
+				// 保存游戏逻辑服务器里的保存操作
+				err := this.game.Save()
+				if err != nil {
+					fmt.Println("【GameServer】保存游戏数据出错：", err.Error())
+				}
+				fmt.Println("【GameServer】Shutdown！")
 				// TODO...
 				return
 			}
@@ -110,7 +136,7 @@ func (this *GameServer) onConnError(err error) {
 // 新玩家连接进入游戏
 func (this *GameServer) handleNewPlayer(conn vaconn.MConn) {
 	defer conn.Close()
-	if this.isPause {
+	if this.state != SER_RUNING {
 		return
 	}
 	player := this.game.CreatePlayer(conn)
@@ -158,5 +184,4 @@ func (this *GameServer) GetLinkCount() int {
 
 func (this *GameServer) ShowCountPlayer() {
 	fmt.Println("GameServer当前连接进入的玩家：", len(this.mpPlayer))
-	// fmt.Println("当前已登入玩家：", len(this.mpLoginPlayer))
 }
