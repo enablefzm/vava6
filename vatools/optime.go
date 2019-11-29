@@ -17,6 +17,9 @@ import (
 func OpTime(lastTime int64, timeSpeed int64) (int64, int) {
 	// 获取当前时间
 	nowTime := time.Now().Unix()
+	if timeSpeed < 1 {
+		return lastTime, 0
+	}
 	// 计算过去时间
 	passTime := nowTime - lastTime
 	// 如果达不到需要的时间就不需计算
