@@ -14,6 +14,7 @@ const (
 
 	SERVER_SOCKET     = "Socket"
 	SERVER_WEB_SOCKET = "WEBSocket"
+	SERVER_WSS_SOCKET = "WssSocket"
 	CLIENT_SOCKET     = "client_socket"
 )
 
@@ -27,6 +28,17 @@ func NewNaviConnect(nType, sPort, sIp string, onLinkFunc func(MConn)) *NaviConne
 	return ob
 }
 
+func NewNaviConnectWss(sPort, sIp, sslPem, sslKey string) *NaviConnect {
+	ob := &NaviConnect{
+		connType: SERVER_WSS_SOCKET,
+		port:     sPort,
+		ip:       sIp,
+		sslPem:   sslPem,
+		sslKey:   sslKey,
+	}
+	return ob
+}
+
 /**
  *	网络连接器
  **/
@@ -34,6 +46,8 @@ type NaviConnect struct {
 	connType string
 	port     string
 	ip       string
+	sslPem   string
+	sslKey   string
 	bufLen   int
 	onfunc   func(MConn)   // 回调函数
 	onCount  func() string // 返回总在线人数
@@ -86,13 +100,23 @@ func (this *NaviConnect) Listen() {
 	switch this.connType {
 	case SERVER_WEB_SOCKET:
 		// 注册
-		http.Handle("/", websocket.Handler(this.onWebSocket))
+		http.Handle("/gameserver", websocket.Handler(this.onWebSocket))
 		http.HandleFunc("/count", this.CountPlayer)
 		// 阻塞侦听
 		valog.OBLog.LogMessage("开始WebSocket侦听 " + this.ip + ":" + this.port + " ...")
 		err := http.ListenAndServe(this.ip+":"+this.port, nil)
 		if err != nil {
 			valog.OBLog.LogMessage("WebSocket服务器启动失败！" + err.Error())
+			this.OnError(err)
+			return
+		}
+	case SERVER_WSS_SOCKET:
+		// 注册
+		http.Handle("/wssgame", websocket.Handler(this.onWebSocket))
+		valog.OBLog.LogMessage("开始WssSocket侦听 " + this.ip + ":" + this.port + " ...")
+		err := http.ListenAndServeTLS(this.ip+":"+this.port, this.sslPem, this.sslKey, nil)
+		if err != nil {
+			valog.OBLog.LogMessage("WssSocket服务器启动失败！" + err.Error())
 			this.OnError(err)
 			return
 		}
