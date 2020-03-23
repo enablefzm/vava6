@@ -29,7 +29,10 @@ func (this *BaseProportion) InitValue(mpProValue map[interface{}]int) {
 	// 计算占比
 	this.mpValue = make(map[interface{}]proportionValue, len(mpProValue))
 	for k, v := range mpProValue {
-		r := float64(v) / dCount * dMax
+		var r float64
+		if dCount > 0 {
+			r = float64(v) / dCount * dMax
+		}
 		tMax := uint16(r) + tMin
 		this.mpValue[k] = proportionValue{
 			min: tMin,
