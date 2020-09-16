@@ -156,6 +156,8 @@ func (d *DBs) Insert(table string, info map[string]interface{}) (sql.Result, err
 		i++
 	}
 	sql := "INSERT INTO " + table + "(" + field + ") VALUES(" + value + ")"
+	// debug
+	// fmt.Println("MySql:", sql)
 	stmt, err := d.db.Prepare(sql)
 	defer stmt.Close()
 	if err != nil {
@@ -164,6 +166,17 @@ func (d *DBs) Insert(table string, info map[string]interface{}) (sql.Result, err
 	}
 	res, err := stmt.Exec(vArr...)
 	return res, err
+}
+
+func (d *DBs) ExecSql(sql string) (sql.Result, error) {
+	stmt, err := d.db.Prepare(sql)
+	defer stmt.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return stmt.Exec()
+	// return d.db.Exec(sql)
 }
 
 // 更新数据到数据库
@@ -201,6 +214,8 @@ func (d *DBs) Update(table string, info, key map[string]interface{}) (sql.Result
 		j++
 	}
 	strSql := fmt.Sprint("UPDATE ", table, " SET ", field, " WHERE ", where) // "UPDATE " + table + " SET " + field + " WHERE " + where
+	// debug
+	// fmt.Println("MySql:", strSql)
 	stmt, err := d.db.Prepare(strSql)
 	if err != nil {
 		return nil, err

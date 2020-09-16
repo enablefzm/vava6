@@ -241,3 +241,27 @@ func GetRndInts(min, max, iCount int) []int {
 	}
 	return res
 }
+
+func GetRndChar(strLen int) string {
+	return GetRndCharOnSource(strLen, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+}
+
+func GetRndCharLow(strLen int) string {
+	return GetRndCharOnSource(strLen, "abcdefghijklmnopqrstuvwxyz0123456789")
+}
+
+func GetRndCharOnSource(strLen int, sourceStr string) string {
+	if strLen < 1 {
+		return ""
+	}
+	if len(sourceStr) < 1 {
+		return ""
+	}
+	strs := []rune(sourceStr)
+	arrRndStr := make([]string, strLen)
+	for i := 0; i < len(arrRndStr); i++ {
+		rndVal := CRnd(0, len(strs)-1)
+		arrRndStr[i] = string(strs[rndVal])
+	}
+	return strings.Join(arrRndStr, "")
+}
